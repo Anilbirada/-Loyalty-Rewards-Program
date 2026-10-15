@@ -122,9 +122,26 @@ class MockFrappeHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
 
-    def do_GET(self):
-        # Route root or check path to check.html
+    def do_HEAD(self):
         path = self.path.split('?')[0]
+        if path in ['/', '/check', '/loyality', '/loyality/check.html', '/index.html', '/health', '/healthz']:
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.end_headers()
+            return
+        super().do_HEAD()
+
+    def do_GET(self):
+        path = self.path.split('?')[0]
+        if path in ['/health', '/healthz']:
+            response = b'{"status": "ok"}'
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(response)))
+            self.end_headers()
+            self.wfile.write(response)
+            return
+
         if path in ['/', '/check', '/loyality', '/loyality/check.html', '/index.html']:
             self.serve_check_page()
             return
