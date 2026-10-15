@@ -12,7 +12,8 @@ import sys
 import webbrowser
 from datetime import datetime
 
-PORT = 8000
+PORT = int(os.environ.get("PORT", 8000))
+HOST = os.environ.get("HOST", "0.0.0.0")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CHECK_HTML_PATH = os.path.join(BASE_DIR, "clp", "www", "loyality", "check.html")
 
@@ -260,10 +261,11 @@ class MockFrappeHandler(http.server.SimpleHTTPRequestHandler):
 
 
 def run_server():
-    server_address = ('127.0.0.1', PORT)
+    socketserver.TCPServer.allow_reuse_address = True
+    server_address = (HOST, PORT)
     with socketserver.TCPServer(server_address, MockFrappeHandler) as httpd:
         print(f"===========================================================")
-        print(f" Customer Loyalty Program (CLP) - Lightweight Local Server")
+        print(f" Customer Loyalty Program (CLP) - Running on {HOST}:{PORT}")
         print(f" Running at: http://localhost:{PORT}")
         print(f" Memory usage: ~25 MB | Zero installation needed!")
         print(f" Press Ctrl+C to stop.")
